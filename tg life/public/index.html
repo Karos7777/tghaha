@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Тест жизненных показателей</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Welcome screen -->
+    <div id="welcome-screen" class="screen active">
+      <h1>Оценка жизненных показателей</h1>
+      <p>Пройдите тест из 10 вопросов, чтобы узнать, сколько дней вам осталось.</p>
+      <p class="note">Внимание: Вы сможете пройти тест повторно только один раз!</p>
+      <button id="start-test-btn" class="btn primary-btn">Начать тест</button>
+    </div>
+
+    <!-- Test screen -->
+    <div id="test-screen" class="screen">
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+        <div id="question-counter">Вопрос <span id="current-question">1</span> из <span id="total-questions">10</span></div>
+      </div>
+      <div id="question-container">
+        <h2 id="question-text">Вопрос загружается...</h2>
+        <div id="answers-container" class="answers-container"></div>
+      </div>
+      
+      <!-- Кнопка управляется через Telegram Main Button -->
+    </div>
+
+    <!-- Results screen -->
+    <div id="results-screen" class="screen">
+      <h1>Ваши результаты</h1>
+      <div class="thermometer-container">
+        <div class="thermometer">
+          <div id="thermometer-fill"></div>
+        </div>
+        <div class="thermometer-scale">
+          <span>0</span>
+          <span>10</span>
+        </div>
+      </div>
+      <div class="results-data">
+        <div class="result-item">
+          <h3>Оценка здоровья:</h3>
+          <p id="health-score">---</p>
+        </div>
+        <div class="result-item">
+          <h3>Осталось дней:</h3>
+          <p id="days-left">---</p>
+        </div>
+        <div class="result-item">
+          <h3>Это примерно:</h3>
+          <p id="years-left">--- лет</p>
+        </div>
+      </div>
+      <div id="attempts-info">
+        <p>У вас осталась <span id="attempts-left">1</span> попытка пройти тест повторно.</p>
+      </div>
+      
+      <!-- Кнопка управляется через Telegram Main Button -->
+    </div>
+
+    <!-- Main App screen -->
+    <div id="main-app-screen" class="screen">
+      <h1>Показатели здоровья</h1>
+      
+      <div class="results-summary">
+        <div class="result-item">
+          <h3>Осталось дней:</h3>
+          <p id="main-days-left">---</p>
+        </div>
+      </div>
+      
+      <!-- Tabs navigation -->
+      <div class="tabs">
+        <div class="tab active" data-tab="health-tab">Здоровье</div>
+        <div class="tab" data-tab="exercise-tab">Активность</div>
+        <div class="tab" data-tab="stats-tab">Статистика</div>
+      </div>
+      
+      <!-- Tab content -->
+      <div id="health-tab" class="tab-content active">
+        <div class="body-map-container" id="body-map-container">
+          <!-- Body map will be inserted here by JavaScript -->
+        </div>
+        
+        <div class="health-issues-container">
+          <h2>Проблемы со здоровьем</h2>
+          <ul id="health-issues-list" class="health-issues-list">
+            <li class="no-issues">Проблем со здоровьем не добавлено</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div id="exercise-tab" class="tab-content">
+        <div id="exercise-tracker-container">
+          <!-- Exercise tracker will be inserted here by JavaScript -->
+        </div>
+      </div>
+      
+      <div id="stats-tab" class="tab-content">
+        <div class="stats-container">
+          <h2>Статистика здоровья</h2>
+          
+          <div class="results-data">
+            <div class="result-item">
+              <h3>Начальное количество дней:</h3>
+              <p id="initial-days">---</p>
+            </div>
+            <div class="result-item">
+              <h3>Дней добавлено:</h3>
+              <p id="stats-days-added">0</p>
+            </div>
+            <div class="result-item">
+              <h3>Дней потеряно:</h3>
+              <p id="days-lost">0</p>
+            </div>
+            <div class="result-item">
+              <h3>Текущий статус:</h3>
+              <p id="health-status">Хороший</p>
+            </div>
+          </div>
+          
+          <div class="last-update-info">
+            <p>Последнее обновление: <span id="last-update-time">---</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Кнопка для добавления проблемы (скрыта, активируется через Telegram Main Button) -->
+    <button id="add-issue-btn" class="btn primary-btn" style="display: none;">Добавить проблему</button>
+    
+    <!-- Кнопка для добавления упражнения (скрыта, активируется через Telegram Main Button) -->
+    <button id="add-exercise-btn" class="btn primary-btn" style="display: none;">Добавить активность</button>
+  </div>
+
+  <script src="body-map.js"></script>
+  <script src="exercise-tracker.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
