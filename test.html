@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Тестовый режим: Тест жизненных показателей</title>
+  <link rel="stylesheet" href="public/styles.css">
+  <script>
+    // Mock Telegram WebApp API for testing
+    window.Telegram = {
+      WebApp: {
+        ready: function() { console.log('WebApp ready'); },
+        expand: function() { console.log('WebApp expanded'); },
+        initDataUnsafe: {
+          user: { id: 123456789, first_name: 'Test', username: 'testuser' }
+        },
+        CloudStorage: {
+          setItem: function(key, value) { 
+            console.log('CloudStorage.setItem:', key, value);
+            localStorage.setItem('tg_' + key, value);
+          }
+        }
+      }
+    };
+
+    // Mock test questions and API
+    const mockQuestions = [
+      {
+        id: 1,
+        question: "Как часто вы занимаетесь физическими упражнениями?",
+        answers: [
+          { id: 1, text: "Ежедневно", value: 10 },
+          { id: 2, text: "4-6 раз в неделю", value: 8 },
+          { id: 3, text: "2-3 раза в неделю", value: 6 },
+          { id: 4, text: "Раз в неделю", value: 4 },
+          { id: 5, text: "Несколько раз в месяц", value: 3 },
+          { id: 6, text: "Редко", value: 2 },
+          { id: 7, text: "Никогда", value: 0 }
+        ]
+      },
+      {
+        id: 2,
+        question: "Как бы вы оценили качество своего сна?",
+        answers: [
+          { id: 1, text: "Отлично, всегда высыпаюсь", value: 10 },
+          { id: 2, text: "Хорошо, редко испытываю проблемы со сном", value: 8 },
+          { id: 3, text: "Нормально, иногда бывают проблемы", value: 6 },
+          { id: 4, text: "Удовлетворительно, часто не высыпаюсь", value: 4 },
+          { id: 5, text: "Плохо, регулярные проблемы со сном", value: 2 },
+          { id: 6, text: "Очень плохо, почти не могу нормально спать", value: 0 }
+        ]
+      },
+      {
+        id: 3,
+        question: "Как часто вы едите свежие фрукты и овощи?",
+        answers: [
+          { id: 1, text: "Несколько раз в день", value: 10 },
+          { id: 2, text: "Ежедневно", value: 8 },
+          { id: 3, text: "4-6 раз в неделю", value: 6 },
+          { id: 4, text: "2-3 раза в неделю", value: 4 },
+          { id: 5, text: "Раз в неделю или реже", value: 2 },
+          { id: 6, text: "Практически никогда", value: 0 }
+        ]
+      },
+      {
+        id: 4,
+        question: "Как часто вы испытываете стресс?",
+        answers: [
+          { id: 1, text: "Практически никогда", value: 10 },
+          { id: 2, text: "Редко", value: 8 },
+          { id: 3, text: "Иногда", value: 6 },
+          { id: 4, text: "Часто", value: 4 },
+          { id: 5, text: "Очень часто", value: 2 },
+          { id: 6, text: "Постоянно", value: 0 }
+        ]
+      },
+      {
+        id: 5,
+        question: "Употребляете ли вы табачные изделия?",
+        answers: [
+          { id: 1, text: "Никогда не курил(а)", value: 10 },
+          { id: 2, text: "Бросил(а) более 5 лет назад", value: 8 },
+          { id: 3, text: "Бросил(а) 1-5 лет назад", value: 6 },
+          { id: 4, text: "Бросил(а) менее года назад", value: 4 },
+          { id: 5, text: "Курю редко/периодически", value: 2 },
+          { id: 6, text: "Курю регулярно", value: 0 }
+        ]
+      },
+      {
+        id: 6,
+        question: "Как часто вы употребляете алкоголь?",
+        answers: [
+          { id: 1, text: "Никогда", value: 10 },
+          { id: 2, text: "Очень редко (несколько раз в год)", value: 8 },
+          { id: 3, text: "Иногда (1-2 раза в месяц)", value: 6 },
+          { id: 4, text: "Умеренно (1-2 раза в неделю)", value: 4 },
+          { id: 5, text: "Часто (3-4 раза в неделю)", value: 2 },
+          { id: 6, text: "Ежедневно", value: 0 }
+        ]
+      },
+      {
+        id: 7,
+        question: "Как бы вы оценили уровень своей энергии в течение дня?",
+        answers: [
+          { id: 1, text: "Отлично, всегда полон(а) энергии", value: 10 },
+          { id: 2, text: "Хорошо, редко чувствую усталость", value: 8 },
+          { id: 3, text: "Нормально, иногда бывает упадок сил", value: 6 },
+          { id: 4, text: "Удовлетворительно, часто чувствую усталость", value: 4 },
+          { id: 5, text: "Плохо, постоянно чувствую себя истощенным(ой)", value: 2 },
+          { id: 6, text: "Очень плохо, едва хватает сил на повседневные дела", value: 0 }
+        ]
+      },
+      {
+        id: 8,
+        question: "Как часто вы проходите медицинские осмотры?",
+        answers: [
+          { id: 1, text: "Регулярно, по графику", value: 10 },
+          { id: 2, text: "Ежегодно", value: 8 },
+          { id: 3, text: "Раз в 2-3 года", value: 6 },
+          { id: 4, text: "Редко, только при появлении симптомов", value: 4 },
+          { id: 5, text: "Очень редко", value: 2 },
+          { id: 6, text: "Никогда не прохожу", value: 0 }
+        ]
+      },
+      {
+        id: 9,
+        question: "Как бы вы оценили свой вес?",
+        answers: [
+          { id: 1, text: "Идеальный для моего роста и телосложения", value: 10 },
+          { id: 2, text: "Близок к идеальному", value: 8 },
+          { id: 3, text: "Немного выше/ниже нормы", value: 6 },
+          { id: 4, text: "Умеренно выше/ниже нормы", value: 4 },
+          { id: 5, text: "Значительно выше/ниже нормы", value: 2 },
+          { id: 6, text: "Крайне выше/ниже нормы", value: 0 }
+        ]
+      },
+      {
+        id: 10,
+        question: "Как часто вы испытываете боли или дискомфорт?",
+        answers: [
+          { id: 1, text: "Практически никогда", value: 10 },
+          { id: 2, text: "Очень редко", value: 8 },
+          { id: 3, text: "Иногда", value: 6 },
+          { id: 4, text: "Часто", value: 4 },
+          { id: 5, text: "Очень часто", value: 2 },
+          { id: 6, text: "Постоянно", value: 0 }
+        ]
+      }
+    ];
+
+    // Mock API endpoints
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options) {
+      if (url === '/api/questions') {
+        return Promise.resolve({
+          json: () => Promise.resolve(mockQuestions)
+        });
+      } else if (url === '/api/calculate') {
+        const data = JSON.parse(options.body);
+        const answers = data.answers;
+        
+        const totalScore = answers.reduce((sum, answer) => sum + answer.value, 0);
+        const averageScore = totalScore / answers.length;
+        const remainingYears = (averageScore).toFixed(1);
+        const remainingDays = Math.round(remainingYears * 365);
+        
+        return Promise.resolve({
+          json: () => Promise.resolve({
+            averageScore,
+            remainingYears,
+            remainingDays
+          })
+        });
+      }
+      
+      return originalFetch(url, options);
+    };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <!-- Welcome screen -->
+    <div id="welcome-screen" class="screen active">
+      <h1>Оценка жизненных показателей</h1>
+      <p>Пройдите тест из 10 вопросов, чтобы узнать, сколько дней вам осталось.</p>
+      <p class="note">Внимание: Вы сможете пройти тест повторно только один раз!</p>
+      <button id="start-test-btn" class="btn primary-btn">Начать тест</button>
+    </div>
+
+    <!-- Test screen -->
+    <div id="test-screen" class="screen">
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+        <div id="question-counter">Вопрос <span id="current-question">1</span> из <span id="total-questions">10</span></div>
+      </div>
+      <div id="question-container">
+        <h2 id="question-text">Вопрос загружается...</h2>
+        <div id="answers-container" class="answers-container"></div>
+      </div>
+      <button id="next-btn" class="btn primary-btn" disabled>Следующий вопрос</button>
+    </div>
+
+    <!-- Results screen -->
+    <div id="results-screen" class="screen">
+      <h1>Ваши результаты</h1>
+      <div class="thermometer-container">
+        <div class="thermometer">
+          <div id="thermometer-fill"></div>
+        </div>
+        <div class="thermometer-scale">
+          <span>0</span>
+          <span>10</span>
+        </div>
+      </div>
+      <div class="results-data">
+        <div class="result-item">
+          <h3>Оценка здоровья:</h3>
+          <p id="health-score">---</p>
+        </div>
+        <div class="result-item">
+          <h3>Осталось дней:</h3>
+          <p id="days-left">---</p>
+        </div>
+        <div class="result-item">
+          <h3>Это примерно:</h3>
+          <p id="years-left">--- лет</p>
+        </div>
+      </div>
+      <div id="attempts-info">
+        <p>У вас осталась <span id="attempts-left">1</span> попытка пройти тест повторно.</p>
+        <button id="restart-btn" class="btn secondary-btn">Пройти тест заново</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="public/app.js"></script>
+</body>
+</html>
